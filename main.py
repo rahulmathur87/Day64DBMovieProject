@@ -82,6 +82,17 @@ def edit():
     return render_template("edit.html", form=form)
 
 
+@app.route("/delete")
+def delete():
+    movie_id = request.args.get("id")
+    with app.app_context():
+        movie_to_delete = db.session.execute(db.select(Movies).where(Movies.id == movie_id)).scalar()
+        # or movie_to_delete = db.get_or_404(Book, book_id)
+        db.session.delete(movie_to_delete)
+        db.session.commit()
+    return redirect(url_for('home'))
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 
