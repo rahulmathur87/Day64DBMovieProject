@@ -7,6 +7,14 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField
 from wtforms.validators import DataRequired
 import requests
+import os
+
+AUTH = os.environ["AUTH"]
+ENDPOINT = "https://api.themoviedb.org/3/search/movie"
+HEADERS = {
+    "accept": "application/json",
+    "Authorization": AUTH
+}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
@@ -102,13 +110,20 @@ def delete():
 def add_movie():
     form = AddMovie()
     if form.validate_on_submit():
-        return redirect(url_for('select'))
+        movie = form.name.data
+        return redirect(url_for('select', search_movie=movie))
     return render_template('add.html', form=form)
 
 
 @app.route("/select")
 def select():
-    return render_template('select.html')
+    search_movie = request.args.get("search_movie")
+    params = {
+        "query": search_movie
+    }
+    response = requests.get(ENDPOINT, headers=HEADERS, params=params)
+    data = response.json()['results']
+    return render_template('select.html', data=data)
 
 
 if __name__ == '__main__':
