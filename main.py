@@ -71,6 +71,14 @@ def home():
 @app.route("/edit", methods=['GET', 'POST'])
 def edit():
     form = UpdateForm()
+    movie_id = request.args.get("id")
+    if form.validate_on_submit():
+        with app.app_context():
+            movie_to_update = db.session.execute(db.select(Movies).where(Movies.id == movie_id)).scalar()
+            movie_to_update.rating = form.rating.data
+            movie_to_update.review = form.review.data
+            db.session.commit()
+        return redirect(url_for('home'))
     return render_template("edit.html", form=form)
 
 
