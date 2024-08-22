@@ -98,10 +98,17 @@ def delete():
     return redirect(url_for('home'))
 
 
-@app.route("/add")
+@app.route("/add", methods=['GET', 'POST'])
 def add_movie():
     form = AddMovie()
+    if form.validate_on_submit():
+        return redirect(url_for('select'))
     return render_template('add.html', form=form)
+
+
+@app.route("/select")
+def select():
+    return render_template('select.html')
 
 
 if __name__ == '__main__':
