@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Float
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, FloatField
 from wtforms.validators import DataRequired
 import requests
 
@@ -21,6 +21,13 @@ class Base(DeclarativeBase):
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///my_movies.db"
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
+
+
+# Edit form
+class UpdateForm(FlaskForm):
+    rating = FloatField('Your Rating Out of 10', validators=[DataRequired()])
+    review = StringField("Your Review", validators=[DataRequired()])
+    submit = SubmitField("Done")
 
 
 # CREATE TABLE
@@ -59,6 +66,12 @@ def home():
         result = db.session.execute(db.select(Movies).order_by(Movies.id))
         all_movies = result.scalars().all()
     return render_template("index.html", movies=all_movies)
+
+
+@app.route("/edit", methods=['GET', 'POST'])
+def edit():
+    form = UpdateForm()
+    return render_template("edit.html", form=form)
 
 
 if __name__ == '__main__':
