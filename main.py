@@ -126,6 +126,24 @@ def select():
     return render_template('select.html', data=data)
 
 
+@app.route("/find")
+def find():
+    tmdb_id = request.args.get("tmdb_id")
+    tmdb_endpoint = f"https://api.themoviedb.org/3/movie/{tmdb_id}"
+    response = requests.get(url=tmdb_endpoint, headers=HEADERS)
+    data = response.json()
+    new_movie = Movies(
+        title=data["title"],
+        img_url=f"https://image.tmdb.org/t/p/w500{data["poster_path"]}",
+        year=data["release_date"].split("-")[0],
+        description=data["overview"]
+    )
+    with app.app_context():
+        db.session.add(new_movie)
+        db.session.commit()
+    return redirect(url_for('home'))
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 
