@@ -141,7 +141,8 @@ def find():
     with app.app_context():
         db.session.add(new_movie)
         db.session.commit()
-    return redirect(url_for('home'))
+        current_movie = db.session.execute(db.select(Movies).where(Movies.title == data["title"])).scalar()
+    return redirect(url_for('edit', id=current_movie.id))
 
 
 if __name__ == '__main__':
