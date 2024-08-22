@@ -30,6 +30,11 @@ class UpdateForm(FlaskForm):
     submit = SubmitField("Done")
 
 
+class AddMovie(FlaskForm):
+    name = StringField("Movie Name", validators=[DataRequired()])
+    search = SubmitField("Search")
+
+
 # CREATE TABLE
 class Movies(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -91,6 +96,12 @@ def delete():
         db.session.delete(movie_to_delete)
         db.session.commit()
     return redirect(url_for('home'))
+
+
+@app.route("/add")
+def add_movie():
+    form = AddMovie()
+    return render_template('add.html', form=form)
 
 
 if __name__ == '__main__':
