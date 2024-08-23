@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, Float
+from sqlalchemy import Integer, String, Float, desc
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField
 from wtforms.validators import DataRequired
@@ -76,10 +76,10 @@ with app.app_context():
 @app.route("/")
 def home():
     with app.app_context():
-        result = db.session.execute(db.select(Movies).order_by(Movies.rating))
+        result = db.session.execute(db.select(Movies).order_by(desc(Movies.rating)))
         all_movies = result.scalars().all()
     for i in range(len(all_movies)):
-        all_movies[i].ranking = len(all_movies) - i
+        all_movies[i].ranking = i+1
     db.session.commit()
     return render_template("index.html", movies=all_movies)
 
